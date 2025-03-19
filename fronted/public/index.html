@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico en Tiempo Real</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Altura en Tiempo Real</h1>
+    <canvas id="chart"></canvas>
+
+    <p>Delay</p>
+    <p id="current_delay"></p>
+
+    <p>Delay promedio</p>
+    <p id="average_delay"></p>
+
+    <script>
+        const ctx = document.getElementById("chart").getContext("2d");
+        
+        // Configurar el gráfico
+        const chart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Altura (m)",
+                    data: [],
+                    borderColor: "blue",
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: "Tiempo (s)" } },
+                    y: { title: { display: true, text: "Altura (m)" } }
+                }
+            }
+        });
+
+        // Conectar al WebSocket en el puerto 4000
+        const socket = io("http://localhost:3000");
+
+        let current_delay = 0;
+        let delayList = []
+        
+        socket.on("send_data", (data) => {
+            console.log("Datos recibidos:", data);
+
+            const { tiempo, valor } = data.altura;
+
+            current_delay = Date.now() - tiempo * 1000
+
+            delayList.push(current_delay)
+
+            // Calcular promedio de delay
+            const average_delay = delayList.reduce((a, b) => a + b, 0) / delayList.length;
+
+            // Agregar datos al gráfico
+            chart.data.labels.push(new Date(tiempo * 1000).toLocaleTimeString());
+            chart.data.datasets[0].data.push(valor);
+
+            chart.update(); // Actualizar gráfico
+
+            document.getElementById('current_delay').textContent = `${current_delay} ms`
+
+            document.getElementById('average_delay').textContent = `${average_delay} ms`
+        });
+    </script>
+</body>
+</html>

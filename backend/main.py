@@ -11,7 +11,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 #Envio de datos 
 
 def send_data():
-    t = 5
+    t = 1
     i = 0
     while True:
         data = {
