@@ -1,4 +1,5 @@
 .vscode
+venv
 *.exe
 *.out
 main
