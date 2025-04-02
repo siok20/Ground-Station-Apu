@@ -6,7 +6,7 @@ python3 backend/main.py &
 SERVER_PID=$!
 
 echo "Desplegando Frontend..."
-cd fronted
+cd frontend
 node index.js &
 FRONTEND_PID=$!
 cd ..

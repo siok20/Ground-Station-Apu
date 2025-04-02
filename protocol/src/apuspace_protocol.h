@@ -1,5 +1,5 @@
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#ifndef APUSPACE_PROTOCOL_H
+#define APUSPACE_PROTOCOL_H
 
 #include <stdint.h>
 #include <string.h>
@@ -11,7 +11,8 @@
 
 #define BNO_DATA_SIZE sizeof(BNO_DATA)
 #define MPL_DATA_SIZE sizeof(MPL_DATA)
-
+#define SHT_DATA_SIZE sizeof(SHT31_DATA)
+#define PanicButton_DATA_SIZE sizeof(PanicButton_DATA)
 #define TLM_DATA_SIZE sizeof(TLM_DATA)
 
 enum DataFrameType {
@@ -31,17 +32,18 @@ typedef struct __attribute__((packed)){
     uint16_t time;        // tiempo de registro      2 bytes  
 } HEADER;
 
-// Estructura de dato del sensor BNO
+// Estructura de dato del sensor BNO085
 typedef struct __attribute__((packed)) {
     int32_t ax, ay, az; // Aceleración (4 bytes)
     int32_t gx, gy, gz; // Giroscopio (4 bytes)
     int32_t mx, my, mz; // Magnetómetro (4 bytes)
 } BNO_DATA;
 
+// Paquete completo del sensor BNO085
 typedef struct __attribute__((packed)) {
     HEADER hd;
     BNO_DATA bno;
-} BNO;
+} BNO085_Packet;
 
 // Estructura de datos del sensor MPL
 typedef struct __attribute__((packed)) {
@@ -53,7 +55,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed))  {
     HEADER hd;
     MPL_DATA mpl;
-}MPL;
+}MPL_Packet;
 
 // Estrucutra para los datos del Telemetrum
 typedef struct __attribute__((packed)) {
@@ -72,7 +74,30 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)){
     HEADER hd;
     TLM_DATA tlm;
-}TLM;
+}TLM_Packet;
+
+// Estructura de datos del sensor SHT31
+typedef struct __attribute__((packed)){
+    int16_t temperature;
+    int16_t humidity;
+} SHT31_DATA;
+
+// Paquete completo del sensor SHT31
+typedef struct __attribute__((packed)){
+    HEADER hd;
+    SHT31_DATA sht;
+} SHT31_Packet;
+
+// Estructura de datos del botón de pánico
+typedef struct __attribute__((packed)) {
+    uint8_t emergency_level; // 1 = Advertencia, 2 = Crítico, 3 = Inminente
+} PanicButton_DATA;
+
+// Paquete completo del botón de pánico
+typedef struct __attribute__((packed)){
+    HEADER hd;
+    PanicButton_DATA pbutton;
+} PanicButton_Packet;
 
 class Protocol{
     public:
@@ -83,22 +108,34 @@ class Protocol{
     static HEADER unpackHeader(const uint8_t* buff);
 
     // Empaqueta un BNO en un buffer
-    static void packBNO(uint8_t* buff, const BNO& packet);
+    static void packBNO(uint8_t* buff, const BNO085_Packet& packet);
 
     // Desempaqueta un BNO desde un buffer
-    static BNO unpackBNO(const uint8_t* buff);
+    static BNO085_Packet unpackBNO(const uint8_t* buff);
 
     // Empaqueta un MPL en un buffer
-    static void packMPL(uint8_t* buff, const MPL& packet);
+    static void packMPL(uint8_t* buff, const MPL_Packet& packet);
 
     // Desempaqueta un MPL desde un buffer
-    static MPL unpackMPL(const uint8_t* buff);
+    static MPL_Packet unpackMPL(const uint8_t* buff);
 
     // Empaqueta un TLM en un buffer
-    static void packTLM(uint8_t* buff, const TLM& packet);
+    static void packTLM(uint8_t* buff, const TLM_Packet& packet);
 
     // Desempaqueta un TLM desde un buffer
-    static TLM unpackTLM(const uint8_t* buff);
+    static TLM_Packet unpackTLM(const uint8_t* buff);
+
+    // Empaqueta un SHT en un buffer
+    static void packSHT(uint8_t* buff, const SHT31_Packet& packet);
+
+    // Desempaqueta un TLM desde un buffer
+    static SHT31_Packet unpackSHT(const uint8_t* buff);
+
+    // Empaqueta un PanicButton en un buffer
+    static void packPanicButton(uint8_t* buff, const PanicButton_Packet& packet);
+
+    // Desempaqueta un PanicButton desde un buffer
+    static PanicButton_Packet unpackPanicButton(const uint8_t* buff);
 
 };
 

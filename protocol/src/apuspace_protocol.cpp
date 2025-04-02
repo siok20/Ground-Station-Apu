@@ -1,4 +1,4 @@
-#include "protocol.h"
+#include "apuspace_protocol.h"
 
 void Protocol::packHeader(uint8_t* buff, const HEADER& header) {
     if (!buff) return; 
@@ -19,45 +19,72 @@ HEADER Protocol::unpackHeader(const uint8_t* buff) {
     return header;
 }
 
-void Protocol::packBNO(uint8_t* buff, const BNO& packet){
+void Protocol::packBNO(uint8_t* buff, const BNO085_Packet& packet){
     if (!buff) return; 
 
     packHeader(buff, packet.hd);
     memcpy(buff + HEADER_SIZE, &packet.bno, BNO_DATA_SIZE);
 }
 
-BNO Protocol::unpackBNO(const uint8_t* buff){
-    BNO packet;
+BNO085_Packet Protocol::unpackBNO(const uint8_t* buff){
+    BNO085_Packet packet;
     packet.hd = unpackHeader(buff);
     memcpy(&packet.bno, buff + HEADER_SIZE, BNO_DATA_SIZE);
     return packet;
 }
 
-void Protocol::packMPL(uint8_t* buff, const MPL& packet) {
+void Protocol::packMPL(uint8_t* buff, const MPL_Packet& packet) {
     if (!buff) return; 
 
     packHeader(buff, packet.hd);
     memcpy(buff + HEADER_SIZE, &packet.mpl, MPL_DATA_SIZE);
 }
 
-MPL Protocol::unpackMPL(const uint8_t* buff) {
-    MPL packet;
+MPL_Packet Protocol::unpackMPL(const uint8_t* buff) {
+    MPL_Packet packet;
     packet.hd = unpackHeader(buff);
     memcpy(&packet.mpl, buff + HEADER_SIZE, MPL_DATA_SIZE);
     return packet;
 }
 
-void Protocol::packTLM(uint8_t* buff, const TLM& packet) {
+void Protocol::packTLM(uint8_t* buff, const TLM_Packet& packet) {
     if (!buff) return; 
 
     packHeader(buff, packet.hd);
     memcpy(buff + HEADER_SIZE, &packet.tlm, TLM_DATA_SIZE);
 }
 
-TLM Protocol::unpackTLM(const uint8_t* buff) {
-    TLM packet;
+TLM_Packet Protocol::unpackTLM(const uint8_t* buff) {
+    TLM_Packet packet;
     packet.hd = unpackHeader(buff);
     memcpy(&packet.tlm, buff + HEADER_SIZE, TLM_DATA_SIZE);
     return packet;
 }
 
+void Protocol::packSHT(uint8_t* buff, const SHT31_Packet& packet){
+    if (!buff) return; 
+
+    packHeader(buff, packet.hd);
+    memcpy(buff + HEADER_SIZE, &packet.sht, SHT_DATA_SIZE);
+}
+
+SHT31_Packet Protocol::unpackSHT(const uint8_t* buff){
+    SHT31_Packet packet;
+    packet.hd = unpackHeader(buff);
+    memcpy(&packet.sht, buff + HEADER_SIZE, SHT_DATA_SIZE);
+    return packet;
+}
+
+void Protocol::packPanicButton(uint8_t* buff, const PanicButton_Packet& packet){
+    if (!buff) return; 
+
+    packHeader(buff, packet.hd);
+    memcpy(buff + HEADER_SIZE, &packet.pbutton, PanicButton_DATA_SIZE);
+}
+
+PanicButton_Packet Protocol::unpackPanicButton(const uint8_t* buff){
+    PanicButton_Packet packet;
+    packet.hd = unpackHeader(buff);
+    memcpy(&packet.pbutton, buff + HEADER_SIZE, PanicButton_DATA_SIZE);
+    return packet;
+}
